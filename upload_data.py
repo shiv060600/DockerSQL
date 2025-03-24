@@ -1,4 +1,8 @@
 import pandas as pd 
+import sqlalchemy 
+
+
+
 def get_back_camera_mp_sum(back_camera_str):
     mega_pixels_sum = 0
     
@@ -26,6 +30,7 @@ df = df[~df["Launched Price (Pakistan)"].str.contains("Not available", na=False)
 df = df[~df["Launched Price (India)"].str.contains("Not available", na=False)]
 df = df[~df["Launched Price (China)"].str.contains("Not available", na=False)]
 df = df[~df["Launched Price (Dubai)"].str.contains("Not available", na=False)]
+df = df[~df["Front Camera"].isnull()]
 
 df["Launched Price (USA)"] = df["Launched Price (USA)"].apply(clean_price_format)
 df["Launched Price (Pakistan)"] = df["Launched Price (Pakistan)"].apply(clean_price_format)
@@ -41,12 +46,10 @@ df = df.rename(columns={"Mobile Weight":"Mobile Weight(g)" , "RAM" : "RAM(GB)", 
                         })
 
 
-
-
 #Organize the frame so that appropriate values are numerics
 df["Mobile Weight(g)"] = df["Mobile Weight(g)"].str[0:3].astype(int)
 df["RAM(GB)"] = df["RAM(GB)"].str[0:1].astype(int)
-df["Front Camera(MP)"] = df["Front Camera(MP)"].apply(lambda x: ''.join([c for c in str(x).split()[0] if c.isdigit()])).astype(int)
+df["Front Camera(MP)"] = df["Front Camera(MP)"].apply(lambda x: ''.join([c for c in str(x).split(',')[0].split('.')[0] if c.isdigit()])).astype(int)
 df["Back Camera(MP)(Total)"] = df["Back Camera(MP)(Total)"].apply(lambda x: get_back_camera_mp_sum(x))
 df["Battery Capacity(mAh)"] = df["Battery Capacity(mAh)"].apply(lambda x :''.join([c for c in str(x) if c.isdigit()])).astype(int)
 df["Launched Price(Pakistan)(PKR)"] = df["Launched Price(Pakistan)(PKR)"].apply(lambda x: ''.join([c for c in str(x) if c.isdigit()])).astype(int)
@@ -60,5 +63,9 @@ df["Screen Size(inches)"] = df["Screen Size(inches)"].apply(lambda x: ''.join([c
 html = df.to_html()
 with open('data_preview.html', 'w') as f:
     f.write(html)
-print(f"HTML preview saved to 'data_preview.html'")
+
+db_engine = sqlalchemy.create_engine('postgresql://root:root@localhost:5433/mobiles_data')
+
+cursor = db_engine.connect()
+
 print(pd.io.sql.get_schema(df,name = "mobiles_data"))
