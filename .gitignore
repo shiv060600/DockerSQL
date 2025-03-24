@@ -1,0 +1,12 @@
+Dockerfile
+services
+mobiles_data/
+
+Dockerfile
+docker-compose*.yml
+services/
+
+# Environment
+__pycache__/
+*.pyc
+.env
