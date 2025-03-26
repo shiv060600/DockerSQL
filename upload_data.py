@@ -69,3 +69,5 @@ db_engine = sqlalchemy.create_engine('postgresql://root:root@localhost:5433/mobi
 cursor = db_engine.connect()
 
 print(pd.io.sql.get_schema(df,name = "mobiles_data"))
+
+df.to_sql(name = "all_mobiles_data", con  = db_engine , if_exists= "replace",index= False)
