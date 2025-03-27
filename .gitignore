@@ -1,7 +1,7 @@
 Dockerfile
 services
 mobiles_data/
-
+data_preview.html
 
 
 # Environment
