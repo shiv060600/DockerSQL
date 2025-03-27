@@ -1,0 +1,18 @@
+services:
+  pg_mobiles:
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=mobiles_data
+    volumes:
+      - "./mobiles_data:/var/lib/postgresql/data:rw"
+    ports:
+      - "5433:5432"
+  pg-database:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - "8080:80"
