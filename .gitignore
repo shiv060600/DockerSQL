@@ -2,7 +2,8 @@ Dockerfile
 services
 mobiles_data/
 data_preview.html
-
+"Mobiles Dataset (2025).csv"
+"Sales.csv"
 
 # Environment
 __pycache__/
