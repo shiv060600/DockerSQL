@@ -34,7 +34,15 @@ def main(args):
     db = args.db
     table_name = args.table_name
     csv_name = "/app/data/Mobiles Dataset (2025).csv"
+    sales_csv = "/app/data/Sales.csv"
 
+    try:
+        sales_df = pd.read_csv(sales_csv)
+        sales_df.rename(columns={"Models": "Model"}, inplace=True)
+        sales_df["Model"] = sales_df["Model"].str.rstrip()
+        sales_df["Mobile"] = sales_df["Mobile"].str.rstrip()
+    except Exception as e:
+        print(f"error loading data: {e}")
 
 
     df = pd.read_csv(csv_name,encoding= "latin1")
@@ -44,7 +52,7 @@ def main(args):
     df = df[~df["Launched Price (India)"].str.contains("Not available", na=False)]
     df = df[~df["Launched Price (China)"].str.contains("Not available", na=False)]
     df = df[~df["Launched Price (Dubai)"].str.contains("Not available", na=False)]
-    df = df[~df["Front Camera"].isnull()]
+    df = df[df["Front Camera"].notnull()]
 
     df["Launched Price (USA)"] = df["Launched Price (USA)"].apply(clean_price_format)
     df["Launched Price (Pakistan)"] = df["Launched Price (Pakistan)"].apply(clean_price_format)
@@ -79,6 +87,11 @@ def main(args):
     #print(pd.io.sql.get_schema(df,name = "mobiles_data"))
 
     df.to_sql(name = table_name, con  = db_engine , if_exists= "replace",index= False)
+    try:
+        sales_df.to_sql(name ="sales_data",con=db_engine, if_exists="replace", index=False)
+    except Exception as e:
+        print(f"Failed to load error : {e} ")
+
 
 """html = df.to_html()
 with open('data_preview.html', 'w') as f:

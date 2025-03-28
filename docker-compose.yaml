@@ -9,6 +9,11 @@ services:
       - "./mobiles_data:/var/lib/postgresql/data:rw"
     ports:
       - "5433:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "root"]
+      interval: 5s
+      retries: 5
+      
   pg-database:
     image: dpage/pgadmin4
     environment:
@@ -16,3 +21,20 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=root
     ports:
       - "8080:80"
+      
+  ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ".:/app/data"
+    depends_on:
+      pg_mobiles:
+        condition: service_healthy
+    command: >
+      --user=root
+      --password=root
+      --host=pg_mobiles
+      --port=5432
+      --db=mobiles_data
+      --table_name=all_mobiles_data
